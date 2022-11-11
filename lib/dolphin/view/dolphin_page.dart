@@ -1,31 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:new_app/dolphin/dolphin.dart';
 
-// TODO: Separate into view
 class DolphinPage extends StatelessWidget {
-  const DolphinPage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
+  const DolphinPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(title),
-        ),
-        body: Stack(children: [
-          const Background(),
-          Column(
+    // Added BlocProvider
+    return BlocProvider(
+      create: (_) => DolphinBloc(),
+      child: const DolphinView(),
+    );
+  }
+}
+
+class DolphinView extends StatelessWidget {
+  const DolphinView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<DolphinBloc, DolphinState>(
+        buildWhen: (prev, state) => prev.runtimeType != state.runtimeType,
+        builder: (context, state) {
+          return Scaffold(
+              appBar: AppBar(
+                title: const Text('Dolphin App'),
+              ),
+              body: Stack(children: const [
+                Background(),
+                ImageView(),
+                Actions(),
+              ]));
+        });
+  }
+}
+
+class ImageView extends StatelessWidget {
+  const ImageView({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<DolphinBloc, DolphinState>(
+        buildWhen: (prev, state) => prev.runtimeType != state.runtimeType,
+        builder: (context, state) {
+          return Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const <Widget>[
+            children: <Widget>[
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 100),
-                // TODO: Implement dolphin view
-                child: Center(child: Text('Welcome to the new dolphin app')),
+                padding: const EdgeInsets.symmetric(vertical: 100),
+                child: Center(child: Image.network(state.url)),
               ),
             ],
-          ),
-          Actions(),
-        ]));
+          );
+        });
   }
 }
 
