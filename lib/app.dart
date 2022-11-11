@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:new_app/dolphin/dolphin.dart';
+import 'package:dolphin_app/dolphin/dolphin.dart';
 
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);

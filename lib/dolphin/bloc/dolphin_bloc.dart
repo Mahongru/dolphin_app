@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:new_app/dolphin/dolphin.dart';
+import 'package:dolphin_app/dolphin/dolphin.dart';
 
 part 'dolphin_event.dart';
 part 'dolphin_state.dart';
