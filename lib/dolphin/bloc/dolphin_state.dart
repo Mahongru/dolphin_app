@@ -1,13 +1,23 @@
 part of 'dolphin_bloc.dart';
 
 abstract class DolphinState extends Equatable {
-  const DolphinState(this.url);
-  final String url;
+  const DolphinState();
 
   @override
   List<Object> get props => [];
 }
 
-class DolphinInitial extends DolphinState {
-  const DolphinInitial(super.url);
+class InitialState extends DolphinState {
+  const InitialState();
+}
+
+class DataLoadedState extends DolphinState {
+  final String id;
+  final String regularLink;
+  final Map urls;
+
+  const DataLoadedState(
+      {required this.id, required this.regularLink, required this.urls});
+  @override
+  List<Object> get props => [id, regularLink, urls];
 }
