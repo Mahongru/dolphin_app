@@ -1,4 +1,3 @@
-// Borrowed from https://bloclibrary.dev/#/fluttertimertutorial
 class Ticker {
   const Ticker();
   Stream<int> tick({required int ticks}) {
