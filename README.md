@@ -20,11 +20,3 @@ After cloning this repository, migrate to ```dolphin_app``` folder. Then, follow
   flutter run
   flutter run -d chrome --web-renderer html (to see the best output)
 ```
-
-### Tech Stack
-**Server**:
-- Firebase: [intro](https://youtu.be/EXp0gq9kGxI) | [docs](https://firebase.google.com/docs?authuser=1&hl=en)
-
-**Client**: 
-- Flutter (cross-platform UI development kit create by Google): [intro](https://youtu.be/l-YO9CmaSUM) | [docs](https://docs.flutter.dev/) 
-- ML Kit (machine learning kit for mobile app created by Google): [intro](https://youtu.be/CQ8iEqblWtY) | [docs](https://developers.google.com/ml-kit/) 
