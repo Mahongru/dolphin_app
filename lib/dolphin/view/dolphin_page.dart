@@ -28,29 +28,52 @@ class ImageView extends StatelessWidget {
   const ImageView({super.key});
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DolphinBloc, DolphinState>(
-        // buildWhen: (prev, state) => prev.runtimeType != state.runtimeType,
-        builder: (context, state) {
+    return BlocBuilder<DolphinBloc, DolphinState>(builder: (context, state) {
       if (state is InitialState) {
         return const Center(
           child: CircularProgressIndicator(),
         );
       }
       if (state is DataLoadedState) {
+        List<DolphinModel> dolphins = state.dolphins;
+        int idx = state.index;
+        if (idx == 4) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Center(child: Image.network(dolphins[idx].url)),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+                FloatingActionButton(
+                    child: const Icon(Icons.refresh),
+                    onPressed: () => BlocProvider.of<DolphinBloc>(context)
+                        .add(InitialApiCall())),
+              ])
+            ],
+          );
+        }
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Center(child: Image.network(state.regularLink)),
+            Center(child: Image.network(dolphins[idx].url)),
             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
               FloatingActionButton(
                   child: const Icon(Icons.refresh),
                   onPressed: () => BlocProvider.of<DolphinBloc>(context)
-                      .add(InitialApiCall())),
+                      .add(NextImage(dolphins, idx))),
+              FloatingActionButton(
+                  child: const Icon(Icons.play_arrow),
+                  onPressed: () => BlocProvider.of<DolphinBloc>(context)
+                      .add(NextImage(dolphins, idx))),
             ])
           ],
         );
       }
 
+      if (state is DataErrorState) {
+        return Center(
+          child: Text('Error ${state.error}'),
+        );
+      }
       return Container();
     });
   }

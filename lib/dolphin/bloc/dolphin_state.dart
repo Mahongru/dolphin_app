@@ -1,23 +1,41 @@
 part of 'dolphin_bloc.dart';
 
 abstract class DolphinState extends Equatable {
-  const DolphinState();
+  final int index;
+  const DolphinState(this.index);
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [index];
 }
 
 class InitialState extends DolphinState {
-  const InitialState();
+  const InitialState() : super(0);
 }
 
 class DataLoadedState extends DolphinState {
-  final String id;
-  final String regularLink;
-  final Map urls;
+  final List<DolphinModel> dolphins;
+  final int index;
 
-  const DataLoadedState(
-      {required this.id, required this.regularLink, required this.urls});
+  const DataLoadedState(this.dolphins, this.index) : super(0);
   @override
-  List<Object> get props => [id, regularLink, urls];
+  List<Object> get props => [dolphins, index];
+}
+
+class DataErrorState extends DolphinState {
+  final String error;
+
+  const DataErrorState(this.error) : super(0);
+  @override
+  List<Object> get props => [error];
+}
+
+class TimerProgress extends DolphinState {
+  const TimerProgress(int index) : super(index);
+
+  @override
+  List<Object> get props => [index];
+}
+
+class TimerComplete extends DolphinState {
+  const TimerComplete() : super(0);
 }
