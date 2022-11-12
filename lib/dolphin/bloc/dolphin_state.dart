@@ -1,42 +1,40 @@
 part of 'dolphin_bloc.dart';
 
 abstract class DolphinState extends Equatable {
-  final int index;
-  const DolphinState(this.index);
+  final int duration;
+  const DolphinState(this.duration);
 
   @override
-  List<Object> get props => [index];
+  List<Object> get props => [duration];
 }
 
 class InitialState extends DolphinState {
   const InitialState() : super(0);
 }
 
-class DataLoadedState extends DolphinState {
-  final List<DolphinModel> dolphins;
-  final int index;
-
-  const DataLoadedState(this.dolphins, this.index) : super(0);
-  @override
-  List<Object> get props => [dolphins, index];
-}
-
-class DataErrorState extends DolphinState {
+class ErrorState extends DolphinState {
   final String error;
 
-  const DataErrorState(this.error) : super(0);
+  const ErrorState(this.error) : super(0);
   @override
   List<Object> get props => [error];
 }
 
-class TimerProgress extends DolphinState {
+class InProgress extends DolphinState {
   final List<DolphinModel> dolphins;
-  const TimerProgress(int index, this.dolphins) : super(index);
+  const InProgress(int duration, this.dolphins) : super(duration);
 
   @override
-  List<Object> get props => [index];
+  List<Object> get props => [duration, dolphins];
 }
 
-class TimerComplete extends DolphinState {
-  const TimerComplete() : super(0);
+class ProgressPaused extends DolphinState {
+  final List<DolphinModel> dolphins;
+  const ProgressPaused(int duration, this.dolphins) : super(duration);
+  @override
+  List<Object> get props => [duration, dolphins];
+}
+
+class Complete extends DolphinState {
+  const Complete() : super(-1);
 }

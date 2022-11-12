@@ -7,28 +7,33 @@ abstract class DolphinEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class InitialApiCall extends DolphinEvent {
+class LoadInitialState extends DolphinEvent {
   @override
   List<Object> get props => [];
 }
 
-class NextImage extends DolphinEvent {
-  const NextImage(this.dolphins, this.pointer);
-  final List<DolphinModel> dolphins;
-  final int pointer;
-
-  @override
-  List<Object> get props => [dolphins];
-}
-
-class TimerStarted extends DolphinEvent {
-  const TimerStarted({required this.duration, required this.dolphins});
+class Play extends DolphinEvent {
+  const Play({required this.duration, required this.dolphins});
   final List<DolphinModel> dolphins;
   final int duration;
+  @override
+  List<Object> get props => [duration, dolphins];
 }
 
-class TimerPaused extends DolphinEvent {
-  const TimerPaused();
+class Pause extends DolphinEvent {
+  const Pause({required this.duration, required this.dolphins});
+  final List<DolphinModel> dolphins;
+  final int duration;
+  @override
+  List<Object> get props => [duration, dolphins];
+}
+
+class Rewind extends DolphinEvent {
+  const Rewind({required this.duration, required this.dolphins});
+  final List<DolphinModel> dolphins;
+  final int duration;
+  @override
+  List<Object> get props => [duration, dolphins];
 }
 
 class TimerTicked extends DolphinEvent {
@@ -39,5 +44,5 @@ class TimerTicked extends DolphinEvent {
   final int duration;
   final List<DolphinModel> dolphins;
   @override
-  List<Object> get props => [duration];
+  List<Object> get props => [duration, dolphins];
 }

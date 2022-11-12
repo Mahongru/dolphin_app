@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:dolphin_app/dolphin/dolphin.dart';
 import 'package:dolphin_app/ticker.dart';
@@ -16,33 +16,43 @@ class DolphinBloc extends Bloc<DolphinEvent, DolphinState> {
 
     StreamSubscription<int>? tickerSubscription;
 
-    on<InitialApiCall>((event, emit) async {
+    on<LoadInitialState>((event, emit) async {
       try {
         List<DolphinModel> dolphins = await _dolphinService.getDolphinImages();
-        emit(DataLoadedState(dolphins, 0));
+
+        emit(ProgressPaused(duration, dolphins));
       } catch (error) {
-        emit(DataErrorState(error.toString()));
+        emit(ErrorState(error.toString()));
       }
     });
-    on<NextImage>((event, emit) {
-      if (event.pointer > 4) {
-        emit(const DataErrorState('No more dolphins'));
-      } else {
-        int idx = event.pointer + 1;
-        emit(DataLoadedState(event.dolphins, idx));
+
+    on<Pause>((event, emit) {
+      if (state is InProgress) {
+        tickerSubscription?.pause();
+        emit(ProgressPaused(state.duration, event.dolphins));
       }
     });
-    on<TimerStarted>((event, emit) {
-      emit(TimerProgress(event.duration, event.dolphins));
+
+    on<Play>((event, emit) {
+      emit(InProgress(event.duration, event.dolphins));
       tickerSubscription?.cancel();
       tickerSubscription = ticker.tick(ticks: event.duration).listen(
           (duration) =>
               add(TimerTicked(duration: duration, dolphins: event.dolphins)));
     });
+
+    on<Rewind>((event, emit) {
+      emit(InProgress(event.duration, event.dolphins));
+      tickerSubscription?.cancel();
+      tickerSubscription = ticker.reverseTick(ticks: event.duration).listen(
+          (duration) =>
+              add(TimerTicked(duration: duration, dolphins: event.dolphins)));
+    });
+
     on<TimerTicked>((event, emit) {
       emit(event.duration < 0
-          ? const TimerComplete()
-          : TimerProgress(event.duration, event.dolphins));
+          ? const Complete()
+          : InProgress(event.duration, event.dolphins));
     });
 
     @override
