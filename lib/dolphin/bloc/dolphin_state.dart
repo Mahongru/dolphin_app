@@ -30,7 +30,8 @@ class DataErrorState extends DolphinState {
 }
 
 class TimerProgress extends DolphinState {
-  const TimerProgress(int index) : super(index);
+  final List<DolphinModel> dolphins;
+  const TimerProgress(int index, this.dolphins) : super(index);
 
   @override
   List<Object> get props => [index];

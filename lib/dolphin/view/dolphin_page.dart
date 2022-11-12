@@ -34,6 +34,19 @@ class ImageView extends StatelessWidget {
           child: CircularProgressIndicator(),
         );
       }
+
+      if (state is TimerProgress) {
+        return Center(
+          child: Image.network(state.dolphins[state.index].url),
+        );
+
+        // TODO Optimize image loading
+        // return ListView.builder(
+        //   itemBuilder: (BuildContext context, int index) =>
+        //       Image.network(state.dolphins[index].url),
+        //   itemCount: state.dolphins.length,
+        // );
+      }
       if (state is DataLoadedState) {
         List<DolphinModel> dolphins = state.dolphins;
         int idx = state.index;
@@ -41,6 +54,7 @@ class ImageView extends StatelessWidget {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              Text((idx + 1).toString()),
               Center(child: Image.network(dolphins[idx].url)),
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
                 FloatingActionButton(
@@ -54,6 +68,7 @@ class ImageView extends StatelessWidget {
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Text(idx.toString()),
             Center(child: Image.network(dolphins[idx].url)),
             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
               FloatingActionButton(
@@ -63,7 +78,7 @@ class ImageView extends StatelessWidget {
               FloatingActionButton(
                   child: const Icon(Icons.play_arrow),
                   onPressed: () => BlocProvider.of<DolphinBloc>(context)
-                      .add(NextImage(dolphins, idx))),
+                      .add(TimerStarted(duration: 4, dolphins: dolphins))),
             ])
           ],
         );

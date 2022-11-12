@@ -22,7 +22,8 @@ class NextImage extends DolphinEvent {
 }
 
 class TimerStarted extends DolphinEvent {
-  const TimerStarted({required this.duration});
+  const TimerStarted({required this.duration, required this.dolphins});
+  final List<DolphinModel> dolphins;
   final int duration;
 }
 
@@ -31,9 +32,12 @@ class TimerPaused extends DolphinEvent {
 }
 
 class TimerTicked extends DolphinEvent {
-  const TimerTicked({required this.duration});
+  const TimerTicked({
+    required this.duration,
+    required this.dolphins,
+  });
   final int duration;
-
+  final List<DolphinModel> dolphins;
   @override
   List<Object> get props => [duration];
 }

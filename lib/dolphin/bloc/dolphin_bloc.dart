@@ -33,18 +33,16 @@ class DolphinBloc extends Bloc<DolphinEvent, DolphinState> {
       }
     });
     on<TimerStarted>((event, emit) {
-      emit(TimerProgress(event.duration));
+      emit(TimerProgress(event.duration, event.dolphins));
       tickerSubscription?.cancel();
-      tickerSubscription = ticker
-          .tick(ticks: event.duration)
-          .listen((duration) => add(TimerTicked(duration: duration)));
+      tickerSubscription = ticker.tick(ticks: event.duration).listen(
+          (duration) =>
+              add(TimerTicked(duration: duration, dolphins: event.dolphins)));
     });
     on<TimerTicked>((event, emit) {
-      emit(
-        event.duration > 0
-            ? TimerProgress(event.duration)
-            : const TimerComplete(),
-      );
+      emit(event.duration < 0
+          ? const TimerComplete()
+          : TimerProgress(event.duration, event.dolphins));
     });
 
     @override
