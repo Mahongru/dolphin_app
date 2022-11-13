@@ -19,25 +19,24 @@ class DolphinBloc extends Bloc<DolphinEvent, DolphinState> {
     Future<List<DolphinModel>> getDolphinImages() async =>
         _dolphinService.getDolphinImages();
 
-    void streamPlay(duration, dolphins) {
+    void streamPlay(duration, images) {
       tickerSubscription?.cancel();
-      tickerSubscription = ticker.tick(ticks: duration).listen((duration) =>
-          add(TimerTicked(duration: duration, dolphins: dolphins)));
+      tickerSubscription = ticker.tick(ticks: duration).listen(
+          (duration) => add(TimerTicked(duration: duration, images: images)));
     }
 
-    void streamRewind(duration, dolphins) {
+    void streamRewind(duration, images) {
       tickerSubscription?.cancel();
       tickerSubscription = ticker.reverseTick(ticks: duration).listen(
-          (duration) =>
-              add(TimerTicked(duration: duration, dolphins: dolphins)));
+          (duration) => add(TimerTicked(duration: duration, images: images)));
     }
 
     on<LoadInitialState>((event, emit) async {
       try {
-        List<DolphinModel> initialDolphins = await getDolphinImages();
+        List<DolphinModel> newImages = await getDolphinImages();
 
-        emit(PlayState(defaultDuration, initialDolphins));
-        streamPlay(defaultDuration, initialDolphins);
+        emit(PlayState(defaultDuration, newImages));
+        streamPlay(defaultDuration, newImages);
       } catch (error) {
         emit(ErrorState(error.toString()));
       }
@@ -45,17 +44,17 @@ class DolphinBloc extends Bloc<DolphinEvent, DolphinState> {
 
     on<Pause>((event, emit) {
       tickerSubscription?.pause();
-      emit(PauseState(event.duration, event.dolphins));
+      emit(PauseState(event.duration, event.images));
     });
 
     on<Play>((event, emit) {
-      emit(PlayState(event.duration, event.dolphins));
-      streamPlay(event.duration, event.dolphins);
+      emit(PlayState(event.duration, event.images));
+      streamPlay(event.duration, event.images);
     });
 
     on<Rewind>((event, emit) {
-      emit(RewindState(event.duration, event.dolphins));
-      streamRewind(event.duration, event.dolphins);
+      emit(RewindState(event.duration, event.images));
+      streamRewind(event.duration, event.images);
     });
 
     on<RewindEnd>((event, emit) {
@@ -68,14 +67,14 @@ class DolphinBloc extends Bloc<DolphinEvent, DolphinState> {
         if (event.duration == 0) {
           add(const LoadInitialState());
         } else {
-          emit(PlayState(event.duration, event.dolphins));
+          emit(PlayState(event.duration, event.images));
         }
       }
       if (state is RewindState) {
         if (event.duration > 5) {
           add(const RewindEnd());
         } else {
-          emit(RewindState(event.duration, event.dolphins));
+          emit(RewindState(event.duration, event.images));
         }
       }
     });

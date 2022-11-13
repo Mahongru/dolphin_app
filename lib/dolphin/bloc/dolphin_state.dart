@@ -21,26 +21,26 @@ class ErrorState extends DolphinState {
 }
 
 class PlayState extends DolphinState {
-  final List<DolphinModel> dolphins;
-  const PlayState(int duration, this.dolphins) : super(duration);
+  final List<DolphinModel> images;
+  const PlayState(int duration, this.images) : super(duration);
 
   @override
-  List<Object> get props => [duration, dolphins];
+  List<Object> get props => [duration, images];
 }
 
 class PauseState extends DolphinState {
-  final List<DolphinModel> dolphins;
-  const PauseState(int duration, this.dolphins) : super(duration);
+  final List<DolphinModel> images;
+  const PauseState(int duration, this.images) : super(duration);
   @override
-  List<Object> get props => [duration, dolphins];
+  List<Object> get props => [duration, images];
 }
 
 class RewindState extends DolphinState {
-  final List<DolphinModel> dolphins;
-  const RewindState(int duration, this.dolphins) : super(duration);
+  final List<DolphinModel> images;
+  const RewindState(int duration, this.images) : super(duration);
 
   @override
-  List<Object> get props => [duration, dolphins];
+  List<Object> get props => [duration, images];
 }
 
 class RewindEndState extends DolphinState {
