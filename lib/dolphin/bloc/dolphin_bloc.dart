@@ -20,13 +20,11 @@ class DolphinBloc extends Bloc<DolphinEvent, DolphinState> {
         _dolphinService.getDolphinImages();
 
     void streamPlay(duration, images) {
-      tickerSubscription?.cancel();
       tickerSubscription = ticker.tick(ticks: duration).listen(
           (duration) => add(TimerTicked(duration: duration, images: images)));
     }
 
     void streamRewind(duration, images) {
-      tickerSubscription?.cancel();
       tickerSubscription = ticker.reverseTick(ticks: duration).listen(
           (duration) => add(TimerTicked(duration: duration, images: images)));
     }
@@ -34,7 +32,7 @@ class DolphinBloc extends Bloc<DolphinEvent, DolphinState> {
     on<LoadInitialState>((event, emit) async {
       try {
         List<DolphinModel> newImages = await getDolphinImages();
-
+        tickerSubscription?.cancel();
         emit(PlayState(defaultDuration, newImages));
         streamPlay(defaultDuration, newImages);
       } catch (error) {
@@ -48,11 +46,13 @@ class DolphinBloc extends Bloc<DolphinEvent, DolphinState> {
     });
 
     on<Play>((event, emit) {
+      tickerSubscription?.cancel();
       emit(PlayState(event.duration, event.images));
       streamPlay(event.duration, event.images);
     });
 
     on<Rewind>((event, emit) {
+      tickerSubscription?.cancel();
       emit(RewindState(event.duration, event.images));
       streamRewind(event.duration, event.images);
     });

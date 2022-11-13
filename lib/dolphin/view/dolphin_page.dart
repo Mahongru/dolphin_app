@@ -48,7 +48,6 @@ class ImageView extends StatelessWidget {
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text((state.duration).toString()),
             CachedNetworkImage(
               imageUrl: imageUrl,
               errorWidget: (context, url, error) => const Icon(Icons.error),
@@ -61,7 +60,6 @@ class ImageView extends StatelessWidget {
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text((state.duration).toString()),
             CachedNetworkImage(
               imageUrl: state.images[index].url,
               errorWidget: (context, url, error) => const Icon(Icons.error),
@@ -75,7 +73,6 @@ class ImageView extends StatelessWidget {
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text((state.duration).toString()),
             CachedNetworkImage(
               imageUrl: imageUrl,
               errorWidget: (context, url, error) => const Icon(Icons.error),
@@ -115,6 +112,7 @@ class Actions extends StatelessWidget {
                   child: const Icon(Icons.play_arrow),
                   onPressed: () => context.read<DolphinBloc>().add(
                       Play(duration: state.duration, images: state.images))),
+              const Text('Paused'),
               FloatingActionButton(
                   child: const Icon(Icons.fast_rewind),
                   onPressed: () => context.read<DolphinBloc>().add(
@@ -125,6 +123,7 @@ class Actions extends StatelessWidget {
                   child: const Icon(Icons.pause),
                   onPressed: () => context.read<DolphinBloc>().add(
                       Pause(duration: state.duration, images: state.images))),
+              const Text('Playing'),
               FloatingActionButton(
                   child: const Icon(Icons.fast_rewind),
                   onPressed: () => context.read<DolphinBloc>().add(
@@ -135,6 +134,7 @@ class Actions extends StatelessWidget {
                   child: const Icon(Icons.play_arrow),
                   onPressed: () => context.read<DolphinBloc>().add(
                       Play(duration: state.duration, images: state.images))),
+              const Text('Rewinding'),
               FloatingActionButton(
                   child: const Icon(Icons.pause),
                   onPressed: () => context.read<DolphinBloc>().add(
