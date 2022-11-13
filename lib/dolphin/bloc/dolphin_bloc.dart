@@ -12,53 +12,72 @@ class DolphinBloc extends Bloc<DolphinEvent, DolphinState> {
 
   DolphinBloc(this._dolphinService) : super(const InitialState()) {
     const Ticker ticker = Ticker();
-    const int duration = 4;
+    const int defaultDuration = 5;
 
     StreamSubscription<int>? tickerSubscription;
 
+    Future<List<DolphinModel>> getDolphinImages() async =>
+        _dolphinService.getDolphinImages();
+
+    void streamPlay(duration, dolphins) {
+      tickerSubscription?.cancel();
+      tickerSubscription = ticker.tick(ticks: duration).listen((duration) =>
+          add(TimerTicked(duration: duration, dolphins: dolphins)));
+    }
+
+    void streamRewind(duration, dolphins) {
+      tickerSubscription?.cancel();
+      tickerSubscription = ticker.reverseTick(ticks: duration).listen(
+          (duration) =>
+              add(TimerTicked(duration: duration, dolphins: dolphins)));
+    }
+
     on<LoadInitialState>((event, emit) async {
       try {
-        List<DolphinModel> dolphins = await _dolphinService.getDolphinImages();
+        List<DolphinModel> initialDolphins = await getDolphinImages();
 
-        emit(ProgressPaused(duration, dolphins));
+        emit(PlayState(defaultDuration, initialDolphins));
+        streamPlay(defaultDuration, initialDolphins);
       } catch (error) {
         emit(ErrorState(error.toString()));
       }
     });
 
     on<Pause>((event, emit) {
-      if (state is InProgress) {
-        tickerSubscription?.pause();
-        emit(ProgressPaused(state.duration, event.dolphins));
-      }
+      tickerSubscription?.pause();
+      emit(PauseState(event.duration, event.dolphins));
     });
 
     on<Play>((event, emit) {
-      emit(InProgress(event.duration, event.dolphins));
-      tickerSubscription?.cancel();
-      tickerSubscription = ticker.tick(ticks: event.duration).listen(
-          (duration) =>
-              add(TimerTicked(duration: duration, dolphins: event.dolphins)));
+      emit(PlayState(event.duration, event.dolphins));
+      streamPlay(event.duration, event.dolphins);
     });
 
     on<Rewind>((event, emit) {
-      emit(InProgress(event.duration, event.dolphins));
-      tickerSubscription?.cancel();
-      tickerSubscription = ticker.reverseTick(ticks: event.duration).listen(
-          (duration) =>
-              add(TimerTicked(duration: duration, dolphins: event.dolphins)));
+      emit(RewindState(event.duration, event.dolphins));
+      streamRewind(event.duration, event.dolphins);
     });
 
-    on<TimerTicked>((event, emit) {
-      emit(event.duration < 0
-          ? const Complete()
-          : InProgress(event.duration, event.dolphins));
+    on<RewindEnd>((event, emit) {
+      tickerSubscription?.cancel();
+      emit(const RewindEndState());
     });
 
-    @override
-    Future<void> close() {
-      tickerSubscription?.cancel();
-      return super.close();
-    }
+    on<TimerTicked>((event, emit) async {
+      if (state is PlayState) {
+        if (event.duration == 0) {
+          add(const LoadInitialState());
+        } else {
+          emit(PlayState(event.duration, event.dolphins));
+        }
+      }
+      if (state is RewindState) {
+        if (event.duration > 5) {
+          add(const RewindEnd());
+        } else {
+          emit(RewindState(event.duration, event.dolphins));
+        }
+      }
+    });
   }
 }

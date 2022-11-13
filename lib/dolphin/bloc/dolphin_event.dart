@@ -8,6 +8,8 @@ abstract class DolphinEvent extends Equatable {
 }
 
 class LoadInitialState extends DolphinEvent {
+  const LoadInitialState();
+
   @override
   List<Object> get props => [];
 }
@@ -34,6 +36,13 @@ class Rewind extends DolphinEvent {
   final int duration;
   @override
   List<Object> get props => [duration, dolphins];
+}
+
+class RewindEnd extends DolphinEvent {
+  const RewindEnd();
+
+  @override
+  List<Object> get props => [];
 }
 
 class TimerTicked extends DolphinEvent {
