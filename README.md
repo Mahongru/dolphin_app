@@ -3,10 +3,10 @@
 An App that displays images of dolphins. Works on Web. 
 
 ### Features
-- [ ] Display a new photo of a Dolphin every 2 seconds
-- [ ] Button that plays/pauses loading of photos every 2 seconds 
-- [ ] Button that rewinds up to 5 old photos then shows ```Cannot remember any more dolphins ```
-- [ ] UI modifications
+- [x] Display a new photo of a Dolphin every 2 seconds
+- [x] Button that plays/pauses loading of photos every 2 seconds 
+- [x] Button that rewinds up to 5 old photos then shows ```Cannot remember any more dolphins ```
+- [x] UI modifications
 - [ ] Testing
 
 ### Installation
