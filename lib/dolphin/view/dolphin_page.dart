@@ -89,7 +89,7 @@ class ImageView extends StatelessWidget {
 
       if (state is ErrorState) {
         return Center(
-          child: Text(state.error),
+          child: Text('Error: Please check console for error type'),
         );
       }
       return Container();
