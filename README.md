@@ -14,9 +14,9 @@ After cloning this repository, migrate to ```dolphin_app``` folder. Then, follow
 - Setup enviroment variables
     - Create .env (see .env.example)
     - Populate Unsplash api credentials
+    - Note: Terminated and restart the application to update .env
 - Run your app:
 ```bash
   flutter pub get
   flutter run
-  flutter run -d chrome --web-renderer html (to see the best output)
 ```
