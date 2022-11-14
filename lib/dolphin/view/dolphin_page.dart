@@ -24,7 +24,8 @@ class DolphinPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const <Widget>[
                     Expanded(flex: 6, child: ImageView()),
-                    Expanded(flex: 2, child: Actions()),
+                    Expanded(flex: 1, child: StatusBar()),
+                    Expanded(flex: 1, child: Actions()),
                   ]),
             ])));
   }
@@ -45,39 +46,31 @@ class ImageView extends StatelessWidget {
 
       if (state is PlayState) {
         String imageUrl = state.images[index].url;
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            CachedNetworkImage(
-              imageUrl: imageUrl,
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-            ),
-          ],
+        return Center(
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+          ),
         );
       }
 
       if (state is RewindState) {
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            CachedNetworkImage(
-              imageUrl: state.images[index].url,
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-            ),
-          ],
+        String imageUrl = state.images[index].url;
+        return Center(
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+          ),
         );
       }
 
       if (state is PauseState) {
         String imageUrl = state.images[index].url;
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            CachedNetworkImage(
-              imageUrl: imageUrl,
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-            ),
-          ],
+        return Center(
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+          ),
         );
       }
 
@@ -88,8 +81,34 @@ class ImageView extends StatelessWidget {
       }
 
       if (state is ErrorState) {
-        return Center(
+        return const Center(
           child: Text('Error: Please check console for error type'),
+        );
+      }
+      return Container();
+    });
+  }
+}
+
+class StatusBar extends StatelessWidget {
+  const StatusBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<DolphinBloc, DolphinState>(builder: (context, state) {
+      if (state is PlayState) {
+        return const Center(
+          child: Text('Playing'),
+        );
+      }
+      if (state is PauseState) {
+        return const Center(
+          child: Text('Paused'),
+        );
+      }
+      if (state is RewindState) {
+        return const Center(
+          child: Text('Rewinding'),
         );
       }
       return Container();
@@ -112,7 +131,6 @@ class Actions extends StatelessWidget {
                   child: const Icon(Icons.play_arrow),
                   onPressed: () => context.read<DolphinBloc>().add(
                       Play(duration: state.duration, images: state.images))),
-              const Text('Paused'),
               FloatingActionButton(
                   child: const Icon(Icons.fast_rewind),
                   onPressed: () => context.read<DolphinBloc>().add(
@@ -123,7 +141,6 @@ class Actions extends StatelessWidget {
                   child: const Icon(Icons.pause),
                   onPressed: () => context.read<DolphinBloc>().add(
                       Pause(duration: state.duration, images: state.images))),
-              const Text('Playing'),
               FloatingActionButton(
                   child: const Icon(Icons.fast_rewind),
                   onPressed: () => context.read<DolphinBloc>().add(
@@ -134,7 +151,6 @@ class Actions extends StatelessWidget {
                   child: const Icon(Icons.play_arrow),
                   onPressed: () => context.read<DolphinBloc>().add(
                       Play(duration: state.duration, images: state.images))),
-              const Text('Rewinding'),
               FloatingActionButton(
                   child: const Icon(Icons.pause),
                   onPressed: () => context.read<DolphinBloc>().add(

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:dolphin_app/dolphin/dolphin.dart';
-import 'package:dolphin_app/ticker.dart';
 
 part 'dolphin_event.dart';
 part 'dolphin_state.dart';
@@ -20,63 +19,66 @@ class DolphinBloc extends Bloc<DolphinEvent, DolphinState> {
         _dolphinService.getDolphinImages();
 
     void streamPlay(duration, images) {
-      tickerSubscription = ticker.tick(ticks: duration).listen(
-          (duration) => add(TimerTicked(duration: duration, images: images)));
+      tickerSubscription?.cancel();
+      tickerSubscription = ticker
+          .play(ticks: duration)
+          .listen((duration) => add(Play(duration: duration, images: images)));
     }
 
     void streamRewind(duration, images) {
-      tickerSubscription = ticker.reverseTick(ticks: duration).listen(
-          (duration) => add(TimerTicked(duration: duration, images: images)));
+      tickerSubscription?.cancel();
+      tickerSubscription = ticker.rewind(ticks: duration).listen(
+          (duration) => add(Rewind(duration: duration, images: images)));
     }
 
     on<LoadInitialState>((event, emit) async {
       try {
         List<DolphinModel> newImages = await getDolphinImages();
-        tickerSubscription?.cancel();
-        emit(PlayState(defaultDuration, newImages));
-        streamPlay(defaultDuration, newImages);
+        add(Play(duration: defaultDuration, images: newImages));
       } catch (error) {
         emit(ErrorState(error.toString()));
       }
     });
 
     on<Pause>((event, emit) {
-      tickerSubscription?.pause();
       emit(PauseState(event.duration, event.images));
+      tickerSubscription?.pause();
     });
 
     on<Play>((event, emit) {
-      tickerSubscription?.cancel();
-      emit(PlayState(event.duration, event.images));
-      streamPlay(event.duration, event.images);
+      if (event.duration == 0) {
+        add(const LoadInitialState());
+      } else {
+        emit(PlayState(event.duration, event.images));
+        streamPlay(event.duration, event.images);
+      }
     });
 
     on<Rewind>((event, emit) {
-      tickerSubscription?.cancel();
-      emit(RewindState(event.duration, event.images));
-      streamRewind(event.duration, event.images);
+      if (event.duration > 5) {
+        add(const RewindEnd());
+      } else {
+        emit(RewindState(event.duration, event.images));
+        streamRewind(event.duration, event.images);
+      }
     });
 
     on<RewindEnd>((event, emit) {
-      tickerSubscription?.cancel();
       emit(const RewindEndState());
+      tickerSubscription?.cancel();
     });
+  }
+}
 
-    on<TimerTicked>((event, emit) async {
-      if (state is PlayState) {
-        if (event.duration == 0) {
-          add(const LoadInitialState());
-        } else {
-          emit(PlayState(event.duration, event.images));
-        }
-      }
-      if (state is RewindState) {
-        if (event.duration > 5) {
-          add(const RewindEnd());
-        } else {
-          emit(RewindState(event.duration, event.images));
-        }
-      }
-    });
+class Ticker {
+  const Ticker();
+  Stream<int> play({required int ticks}) {
+    return Stream.periodic(const Duration(seconds: 2), (x) => ticks - x - 1)
+        .take(ticks);
+  }
+
+  Stream<int> rewind({required int ticks}) {
+    return Stream.periodic(const Duration(seconds: 2), (x) => ticks + x + 1)
+        .take(ticks);
   }
 }
