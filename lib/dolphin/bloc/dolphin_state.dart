@@ -14,8 +14,8 @@ class InitialState extends DolphinState {
 
 class ErrorState extends DolphinState {
   final String error;
-
   const ErrorState(this.error) : super(0);
+
   @override
   List<Object> get props => [error];
 }
@@ -31,6 +31,7 @@ class PlayState extends DolphinState {
 class PauseState extends DolphinState {
   final List<DolphinModel> images;
   const PauseState(int duration, this.images) : super(duration);
+
   @override
   List<Object> get props => [duration, images];
 }

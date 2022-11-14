@@ -15,25 +15,28 @@ class LoadInitialState extends DolphinEvent {
 }
 
 class Play extends DolphinEvent {
-  const Play({required this.duration, required this.images});
-  final List<DolphinModel> images;
   final int duration;
+  final List<DolphinModel> images;
+  const Play({required this.duration, required this.images});
+
   @override
   List<Object> get props => [duration, images];
 }
 
 class Pause extends DolphinEvent {
-  const Pause({required this.duration, required this.images});
-  final List<DolphinModel> images;
   final int duration;
+  final List<DolphinModel> images;
+  const Pause({required this.duration, required this.images});
+
   @override
   List<Object> get props => [duration, images];
 }
 
 class Rewind extends DolphinEvent {
-  const Rewind({required this.duration, required this.images});
-  final List<DolphinModel> images;
   final int duration;
+  final List<DolphinModel> images;
+  const Rewind({required this.duration, required this.images});
+
   @override
   List<Object> get props => [duration, images];
 }
@@ -43,15 +46,4 @@ class RewindEnd extends DolphinEvent {
 
   @override
   List<Object> get props => [];
-}
-
-class TimerTicked extends DolphinEvent {
-  const TimerTicked({
-    required this.duration,
-    required this.images,
-  });
-  final int duration;
-  final List<DolphinModel> images;
-  @override
-  List<Object> get props => [duration, images];
 }
