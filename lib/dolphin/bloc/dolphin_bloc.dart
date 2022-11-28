@@ -20,35 +20,39 @@ class DolphinBloc extends Bloc<DolphinEvent, DolphinState> {
         _dolphinService.getDolphinImage();
 
     // --  Mock API
-    // Future<String> fetchImage(int pointer) =>
-    //     Future.delayed(const Duration(microseconds: 100), () async {
-    //       String output = 'Dolphin.$pointer';
-    //       return output;
-    //     });
+    Future<String> fetchImage(int pointer) =>
+        Future.delayed(const Duration(microseconds: 100), () async {
+          String output = 'Dolphin.$pointer';
+          return output;
+        });
 
     void streamPlay(duration) {
       tickerSubscription?.cancel();
       tickerSubscription =
           ticker.play(duration: duration).listen((duration) async {
         if (pointer == 0 && images.isEmpty) {
-          DolphinModel imageUrl = await getDolphinImage();
-          images.add(imageUrl.url);
-
+          // DolphinModel imageUrl = await getDolphinImage();
+          // images.add(imageUrl.url);
+          String imageUrl = await fetchImage(pointer);
+          images.add(imageUrl);
           pointer++;
           add(const Play());
         }
         if (images.isNotEmpty) {
           if (pointer == images.length && pointer < 5) {
-            DolphinModel imageUrl = await getDolphinImage();
-            images.add(imageUrl.url);
-
+            // DolphinModel imageUrl = await getDolphinImage();
+            // images.add(imageUrl.url);
+            String imageUrl = await fetchImage(pointer);
+            images.add(imageUrl);
             pointer++;
             add(const Play());
           } else if (pointer == 5) {
-            DolphinModel imageUrl = await getDolphinImage();
+            // DolphinModel imageUrl = await getDolphinImage();
+            // images.removeAt(0);
+            // images.add(imageUrl.url);
+            String imageUrl = await fetchImage(pointer);
             images.removeAt(0);
-            images.add(imageUrl.url);
-
+            images.add(imageUrl);
             pointer = 5;
             add(const Play());
           } else {
@@ -77,7 +81,6 @@ class DolphinBloc extends Bloc<DolphinEvent, DolphinState> {
     });
 
     on<Play>((event, emit) async {
-      // print('pointer @ $pointer ${images.length} $images');
       emit(PlayState(images[pointer - 1]));
       streamPlay(pointer);
     });
@@ -88,13 +91,11 @@ class DolphinBloc extends Bloc<DolphinEvent, DolphinState> {
     });
 
     on<Rewind>((event, emit) async {
-      // print('pointer @ $pointer ${images.length} $images');
       emit(RewindState(images[pointer - 1]));
       streamRewind(pointer);
     });
 
     on<RewindEnd>((event, emit) async {
-      // print('pointer @ $pointer $images');
       emit(const StopState());
     });
   }

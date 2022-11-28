@@ -44,31 +44,31 @@ class ImageView extends StatelessWidget {
 
       if (state is PlayState) {
         return Center(
-          child: CachedNetworkImage(
-            imageUrl: state.imageUrl,
-            errorWidget: (context, url, error) => const Icon(Icons.error),
-          ),
-          // child: Text(state.imageUrl),
+          // child: CachedNetworkImage(
+          //   imageUrl: state.imageUrl,
+          //   errorWidget: (context, url, error) => const Icon(Icons.error),
+          // ),
+          child: Text(state.imageUrl),
         );
       }
 
       if (state is RewindState) {
         return Center(
-          child: CachedNetworkImage(
-            imageUrl: state.imageUrl,
-            errorWidget: (context, url, error) => const Icon(Icons.error),
-          ),
-          // child: Text(state.imageUrl),
+          // child: CachedNetworkImage(
+          //   imageUrl: state.imageUrl,
+          //   errorWidget: (context, url, error) => const Icon(Icons.error),
+          // ),
+          child: Text(state.imageUrl),
         );
       }
 
       if (state is PauseState) {
         return Center(
-          child: CachedNetworkImage(
-            imageUrl: state.imageUrl,
-            errorWidget: (context, url, error) => const Icon(Icons.error),
-          ),
-          // child: Text(state.imageUrl),
+          // child: CachedNetworkImage(
+          //   imageUrl: state.imageUrl,
+          //   errorWidget: (context, url, error) => const Icon(Icons.error),
+          // ),
+          child: Text(state.imageUrl),
         );
       }
 
