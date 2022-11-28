@@ -9,76 +9,110 @@ part 'dolphin_state.dart';
 class DolphinBloc extends Bloc<DolphinEvent, DolphinState> {
   final DolphinService _dolphinService;
 
-  DolphinBloc(this._dolphinService) : super(const InitialState()) {
+  DolphinBloc(this._dolphinService) : super(const InitialState('')) {
     const Ticker ticker = Ticker();
-    const int defaultDuration = 5;
+    List<String> images = [];
+    int pointer = 0;
 
     StreamSubscription<int>? tickerSubscription;
 
-    Future<List<DolphinModel>> getDolphinImages() async =>
-        _dolphinService.getDolphinImages();
+    Future<DolphinModel> getDolphinImage() async =>
+        _dolphinService.getDolphinImage();
 
-    void streamPlay(duration, images) {
+    // --  Mock API
+    // Future<String> fetchImage(int pointer) =>
+    //     Future.delayed(const Duration(microseconds: 100), () async {
+    //       String output = 'Dolphin.$pointer';
+    //       return output;
+    //     });
+
+    void streamPlay(duration) {
       tickerSubscription?.cancel();
-      tickerSubscription = ticker
-          .play(ticks: duration)
-          .listen((duration) => add(Play(duration: duration, images: images)));
+      tickerSubscription =
+          ticker.play(duration: duration).listen((duration) async {
+        if (pointer == 0 && images.isEmpty) {
+          DolphinModel imageUrl = await getDolphinImage();
+          images.add(imageUrl.url);
+
+          pointer++;
+          add(const Play());
+        }
+        if (images.isNotEmpty) {
+          if (pointer == images.length && pointer < 5) {
+            DolphinModel imageUrl = await getDolphinImage();
+            images.add(imageUrl.url);
+
+            pointer++;
+            add(const Play());
+          } else if (pointer == 5) {
+            DolphinModel imageUrl = await getDolphinImage();
+            images.removeAt(0);
+            images.add(imageUrl.url);
+
+            pointer = 5;
+            add(const Play());
+          } else {
+            pointer++;
+            add(const Play());
+          }
+        }
+      });
     }
 
-    void streamRewind(duration, images) {
+    void streamRewind(duration) {
       tickerSubscription?.cancel();
-      tickerSubscription = ticker.rewind(ticks: duration).listen(
-          (duration) => add(Rewind(duration: duration, images: images)));
+      tickerSubscription =
+          ticker.rewind(duration: duration).listen((duration) async {
+        if (pointer == 1) {
+          add(const RewindEnd());
+        } else {
+          pointer--;
+          add(const Rewind());
+        }
+      });
     }
 
     on<LoadInitialState>((event, emit) async {
-      try {
-        List<DolphinModel> newImages = await getDolphinImages();
-        add(Play(duration: defaultDuration, images: newImages));
-      } catch (error) {
-        emit(ErrorState(error.toString()));
-      }
+      streamPlay(pointer);
+    });
+
+    on<Play>((event, emit) async {
+      // print('pointer @ $pointer ${images.length} $images');
+      emit(PlayState(images[pointer - 1]));
+      streamPlay(pointer);
     });
 
     on<Pause>((event, emit) {
-      emit(PauseState(event.duration, event.images));
       tickerSubscription?.pause();
+      emit(PauseState(images[pointer - 1]));
     });
 
-    on<Play>((event, emit) {
-      if (event.duration == 0) {
-        add(const LoadInitialState());
-      } else {
-        emit(PlayState(event.duration, event.images));
-        streamPlay(event.duration, event.images);
-      }
+    on<Rewind>((event, emit) async {
+      // print('pointer @ $pointer ${images.length} $images');
+      emit(RewindState(images[pointer - 1]));
+      streamRewind(pointer);
     });
 
-    on<Rewind>((event, emit) {
-      if (event.duration > 5) {
-        add(const RewindEnd());
-      } else {
-        emit(RewindState(event.duration, event.images));
-        streamRewind(event.duration, event.images);
-      }
-    });
-
-    on<RewindEnd>((event, emit) {
-      emit(const RewindEndState());
-      tickerSubscription?.cancel();
+    on<RewindEnd>((event, emit) async {
+      // print('pointer @ $pointer $images');
+      emit(const StopState());
     });
   }
 }
 
 class Ticker {
   const Ticker();
-  Stream<int> play({required int ticks}) {
-    return Stream.periodic(const Duration(seconds: 2), (x) => ticks - x - 1)
-        .take(ticks);
+  Stream<int> play({required int duration}) {
+    if (duration == 0) {
+      return Stream.periodic(const Duration(seconds: 2), (x) => x + 1);
+    } else {
+      return Stream.periodic(const Duration(seconds: 2), (x) => x)
+          .take(duration);
+    }
   }
 
-  Stream<int> rewind({required int ticks}) {
-    return Stream.periodic(const Duration(seconds: 2), (x) => ticks + x + 1)
-        .take(ticks);
+  Stream<int> rewind({required int duration}) {
+    return Stream.periodic(const Duration(seconds: 2), (x) => x - 1)
+        .take(duration);
   }
 }

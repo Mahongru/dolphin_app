@@ -21,17 +21,16 @@ class DolphinService {
   Uri endpoint = Uri.https('api.unsplash.com', '/photos/random', {
     'query': 'dolphin',
     'client_id': dotenv.env['CLIENT_ID'],
-    'count': '5',
     'orientation': 'squarish'
   });
 
-  Future<List<DolphinModel>> getDolphinImages() async {
+  Future<DolphinModel> getDolphinImage() async {
     Response response = await get(endpoint);
 
     if (response.statusCode == 200) {
-      final List result = jsonDecode(response.body);
+      final Map<String, dynamic> result = jsonDecode(response.body);
 
-      return result.map(((e) => DolphinModel.fromJson(e))).toList();
+      return DolphinModel.fromJson(result);
     } else {
       throw Exception(response.reasonPhrase);
     }

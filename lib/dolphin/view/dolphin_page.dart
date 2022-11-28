@@ -36,8 +36,6 @@ class ImageView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DolphinBloc, DolphinState>(builder: (context, state) {
-      int index = state.duration - 1;
-
       if (state is InitialState) {
         return const Center(
           child: CircularProgressIndicator(),
@@ -45,36 +43,36 @@ class ImageView extends StatelessWidget {
       }
 
       if (state is PlayState) {
-        String imageUrl = state.images[index].url;
         return Center(
           child: CachedNetworkImage(
-            imageUrl: imageUrl,
+            imageUrl: state.imageUrl,
             errorWidget: (context, url, error) => const Icon(Icons.error),
           ),
+          // child: Text(state.imageUrl),
         );
       }
 
       if (state is RewindState) {
-        String imageUrl = state.images[index].url;
         return Center(
           child: CachedNetworkImage(
-            imageUrl: imageUrl,
+            imageUrl: state.imageUrl,
             errorWidget: (context, url, error) => const Icon(Icons.error),
           ),
+          // child: Text(state.imageUrl),
         );
       }
 
       if (state is PauseState) {
-        String imageUrl = state.images[index].url;
         return Center(
           child: CachedNetworkImage(
-            imageUrl: imageUrl,
+            imageUrl: state.imageUrl,
             errorWidget: (context, url, error) => const Icon(Icons.error),
           ),
+          // child: Text(state.imageUrl),
         );
       }
 
-      if (state is RewindEndState) {
+      if (state is StopState) {
         return const Center(
           child: Text('Cannot remember any more dolphins'),
         );
@@ -106,6 +104,11 @@ class StatusBar extends StatelessWidget {
           child: Text('Paused'),
         );
       }
+      if (state is StopState) {
+        return const Center(
+          child: Text('Stopped'),
+        );
+      }
       if (state is RewindState) {
         return const Center(
           child: Text('Rewinding'),
@@ -126,42 +129,49 @@ class Actions extends StatelessWidget {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
+            if (state is StopState) ...[
+              FloatingActionButton(
+                  key: const Key('playButton'),
+                  child: const Icon(Icons.play_arrow),
+                  onPressed: () =>
+                      context.read<DolphinBloc>().add(const Play())),
+              FloatingActionButton(
+                  key: const Key('rewindButton'),
+                  child: const Icon(Icons.fast_rewind),
+                  onPressed: () =>
+                      context.read<DolphinBloc>().add(const Rewind())),
+            ],
             if (state is PauseState) ...[
               FloatingActionButton(
+                  key: const Key('playButton'),
                   child: const Icon(Icons.play_arrow),
-                  onPressed: () => context.read<DolphinBloc>().add(
-                      Play(duration: state.duration, images: state.images))),
+                  onPressed: () => context.read<DolphinBloc>().add(Play())),
               FloatingActionButton(
+                  key: const Key('rewindButton'),
                   child: const Icon(Icons.fast_rewind),
-                  onPressed: () => context.read<DolphinBloc>().add(
-                      Rewind(duration: state.duration, images: state.images))),
+                  onPressed: () =>
+                      context.read<DolphinBloc>().add(const Rewind())),
             ],
             if (state is PlayState) ...[
               FloatingActionButton(
+                  key: const Key('pauseButton'),
                   child: const Icon(Icons.pause),
-                  onPressed: () => context.read<DolphinBloc>().add(
-                      Pause(duration: state.duration, images: state.images))),
+                  onPressed: () => context.read<DolphinBloc>().add(Pause())),
               FloatingActionButton(
+                  key: const Key('rewindButton'),
                   child: const Icon(Icons.fast_rewind),
-                  onPressed: () => context.read<DolphinBloc>().add(
-                      Rewind(duration: state.duration, images: state.images))),
+                  onPressed: () =>
+                      context.read<DolphinBloc>().add(const Rewind())),
             ],
             if (state is RewindState) ...[
               FloatingActionButton(
+                  key: const Key('playButton'),
                   child: const Icon(Icons.play_arrow),
-                  onPressed: () => context.read<DolphinBloc>().add(
-                      Play(duration: state.duration, images: state.images))),
+                  onPressed: () => context.read<DolphinBloc>().add(Play())),
               FloatingActionButton(
+                  key: const Key('pauseButton'),
                   child: const Icon(Icons.pause),
-                  onPressed: () => context.read<DolphinBloc>().add(
-                      Pause(duration: state.duration, images: state.images))),
-            ],
-            if (state is RewindEndState) ...[
-              FloatingActionButton(
-                  child: const Icon(Icons.restart_alt_sharp),
-                  onPressed: () => context
-                      .read<DolphinBloc>()
-                      .add(const LoadInitialState())),
+                  onPressed: () => context.read<DolphinBloc>().add(Pause())),
             ],
           ],
         );
