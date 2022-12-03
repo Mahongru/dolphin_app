@@ -33,6 +33,16 @@ class DolphinPage extends StatelessWidget {
 
 class ImageView extends StatelessWidget {
   const ImageView({super.key});
+
+  Widget imageView(state) {
+    return Center(
+        // child: CachedNetworkImage(
+        //   imageUrl: state.imageUrl,
+        //   errorWidget: (context, url, error) => const Icon(Icons.error),
+        // ),
+        child: Text(state.imageUrl));
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DolphinBloc, DolphinState>(builder: (context, state) {
@@ -42,34 +52,8 @@ class ImageView extends StatelessWidget {
         );
       }
 
-      if (state is PlayState) {
-        return Center(
-          // child: CachedNetworkImage(
-          //   imageUrl: state.imageUrl,
-          //   errorWidget: (context, url, error) => const Icon(Icons.error),
-          // ),
-          child: Text(state.imageUrl),
-        );
-      }
-
-      if (state is RewindState) {
-        return Center(
-          // child: CachedNetworkImage(
-          //   imageUrl: state.imageUrl,
-          //   errorWidget: (context, url, error) => const Icon(Icons.error),
-          // ),
-          child: Text(state.imageUrl),
-        );
-      }
-
-      if (state is PauseState) {
-        return Center(
-          // child: CachedNetworkImage(
-          //   imageUrl: state.imageUrl,
-          //   errorWidget: (context, url, error) => const Icon(Icons.error),
-          // ),
-          child: Text(state.imageUrl),
-        );
+      if (state is PlayState || state is RewindState || state is PauseState) {
+        return imageView(state);
       }
 
       if (state is StopState) {
@@ -91,30 +75,29 @@ class ImageView extends StatelessWidget {
 class StatusBar extends StatelessWidget {
   const StatusBar({super.key});
 
+  String getStatus(DolphinState state) {
+    if (state is PlayState) {
+      return 'Playing';
+    }
+    if (state is PauseState) {
+      return 'Paused';
+    }
+    if (state is RewindState) {
+      return 'Rewinding';
+    }
+    if (state is StopState) {
+      return 'Stopped';
+    }
+
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DolphinBloc, DolphinState>(builder: (context, state) {
-      if (state is PlayState) {
-        return const Center(
-          child: Text('Playing'),
-        );
-      }
-      if (state is PauseState) {
-        return const Center(
-          child: Text('Paused'),
-        );
-      }
-      if (state is StopState) {
-        return const Center(
-          child: Text('Stopped'),
-        );
-      }
-      if (state is RewindState) {
-        return const Center(
-          child: Text('Rewinding'),
-        );
-      }
-      return Container();
+      return Center(
+        child: Text(getStatus(state)),
+      );
     });
   }
 }
@@ -131,41 +114,55 @@ class Actions extends StatelessWidget {
           children: [
             FloatingActionButton(
                 key: const Key('ButtonLeft'),
-                child: state is PauseState ||
-                        state is RewindState ||
-                        state is StopState
-                    ? const Icon(Icons.play_arrow)
-                    : const Icon(Icons.pause),
-                onPressed: () {
-                  if (state is PauseState ||
-                      state is RewindState ||
-                      state is StopState) {
-                    return context.read<DolphinBloc>().add(const Play());
-                  }
-                  if (state is PlayState) {
-                    return context.read<DolphinBloc>().add(const Pause());
-                  }
-                }),
+                child: getIcon('ButtonLeft', state),
+                onPressed: () => getActionState('ButtonLeft', state, context)),
             FloatingActionButton(
                 key: const Key('ButtonRight'),
-                child: state is PauseState ||
-                        state is PlayState ||
-                        state is StopState
-                    ? const Icon(Icons.fast_rewind)
-                    : const Icon(Icons.pause),
-                onPressed: () {
-                  if (state is PauseState ||
-                      state is PlayState ||
-                      state is StopState) {
-                    return context.read<DolphinBloc>().add(const Rewind());
-                  }
-                  if (state is RewindState) {
-                    return context.read<DolphinBloc>().add(const Pause());
-                  }
-                }),
+                child: getIcon('ButtonRight', state),
+                onPressed: () => getActionState('ButtonRight', state, context)),
           ],
         );
       },
     );
+  }
+
+  Widget getIcon(button, state) {
+    if (button == 'ButtonLeft') {
+      if (state is PauseState || state is RewindState || state is StopState) {
+        return const Icon(Icons.play_arrow);
+      } else {
+        return const Icon(Icons.pause);
+      }
+    }
+
+    if (button == 'ButtonRight') {
+      if (state is PauseState || state is PlayState || state is StopState) {
+        return const Icon(Icons.fast_rewind);
+      } else {
+        return const Icon(Icons.pause);
+      }
+    }
+
+    return Container();
+  }
+
+  void getActionState(String button, DolphinState state, BuildContext context) {
+    if (button == 'ButtonLeft') {
+      if (state is PauseState || state is RewindState || state is StopState) {
+        context.read<DolphinBloc>().add(const Play());
+      }
+      if (state is PlayState) {
+        context.read<DolphinBloc>().add(const Pause());
+      }
+    }
+
+    if (button == 'ButtonRight') {
+      if (state is PauseState || state is PlayState || state is StopState) {
+        context.read<DolphinBloc>().add(const Rewind());
+      }
+      if (state is PlayState) {
+        context.read<DolphinBloc>().add(const Pause());
+      }
+    }
   }
 }
